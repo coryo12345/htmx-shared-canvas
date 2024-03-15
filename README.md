@@ -17,9 +17,11 @@ A live shared canvas for multiple users to draw on! This was a project to work w
 * [x] use logger for errors
 * [x] add a utility endpoint to clear the canvas
 * [x] make README a bit better
-* [ ] make git repo
+* [x] make git repo
 * [ ] deploy!
-* [ ] add to website
+* [ ] add deployed site link to README
+* [ ] add to my website
+* [ ] clear TODO list
 * [ ] allow for zooming on canvas
 
 ## Technology
