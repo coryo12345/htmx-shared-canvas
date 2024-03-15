@@ -2,10 +2,7 @@
 FROM golang:1.22.1-alpine AS build
 
 # install node & make for build steps
-# RUN apt-get update && \
-#     apt-get install -y software-properties-common npm make
-
-# n requires bash for some reason
+#   (n requires bash)
 RUN apk add --update npm make bash 
 RUN npm install npm@latest -g 
 RUN npm install n -g
