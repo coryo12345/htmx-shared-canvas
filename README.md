@@ -2,6 +2,11 @@
 
 A live shared canvas for multiple users to draw on! This was a project to work with websockets, as well as experience with HTMX-powered applications. The goal for this application was to make an app with some user interaction without having to write any JavaScript code to build a frontend for the app. THanks to a few important pieces of technology (see section below), I was able to achieve this no-JS application with live updates to the canvas for all users! 
 
+## Check it out
+Check out the app live at [https://canvas.corydio.com/](https://canvas.corydio.com/).
+
+Open multiple tabs, browsers, or try it on multiple devices & the canvas will sync across all of them.
+
 <img src="./doc/app.png" alt="app screenshot" width="300px">
 
 ## TODO
@@ -19,7 +24,7 @@ A live shared canvas for multiple users to draw on! This was a project to work w
 * [x] make README a bit better
 * [x] make git repo
 * [x] deploy!
-* [ ] add deployed site link to README
+* [x] add deployed site link to README
 * [ ] add to my website
 * [ ] clear TODO list
 * [ ] allow for zooming on canvas
