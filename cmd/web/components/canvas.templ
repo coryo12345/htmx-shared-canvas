@@ -1,0 +1,42 @@
+package components
+
+import (
+	"fmt"
+	"shared-canvas/internal/canvas"
+)
+
+templ Canvas(canvas *canvas.Canvas) {
+	<article x-data="{ showGrid: false, color: '#000099' }" hx-ext="ws" ws-connect="/ws">
+		@Card(CardProps{Title: "Tools", MaxWidth: "350px"}) {
+			<section class="my-2">
+				<input name="showGrid" id="showGrid" type="checkbox" :checked="showGrid" @change="showGrid = $event.target.checked"/>
+				<label for="showGrid">Show Grid Lines</label>
+			</section>
+			<section>
+				<div class="my-2 flex items-center justify-start gap-1">
+					<input name="color" id="color" type="color" :value="color" @change="color = $event.target.value" class="rounded h-6 w-10"/>
+					<label for="color">Choose Color</label>
+				</div>
+				<div class="grid grid-cols-6 w-fit">
+					for _, color := range CanvasColors() {
+						@templ.Raw(fmt.Sprintf("<span @click=\"color = '%s'\" class=\"inline-block h-4 w-8 %s\" style=\"background-color: %s\"></span>", color.Color, color.Border, color.Color))
+					}
+				</div>
+			</section>
+		}
+		@Card(CardProps{Class: "w-fit overflow-x-scroll pr-0 ", MaxWidth: "100%"}) {
+			@templ.Raw(fmt.Sprintf("<div class=\"grid w-fit mx-auto pr-4\" style=\"grid-template-columns: repeat(%d,1fr)\">", canvas.Width()))
+			for i, pixel := range canvas.Pixels() {
+				@CanvasPixel(i, pixel)
+			}
+			@templ.Raw("</div>")
+		}
+	</article>
+}
+
+templ CanvasPixel(pos int, pixel canvas.Pixel) {
+	<form id={ fmt.Sprintf("pixel-%d", pos) } ws-send hx-swap-oob="true" hx-trigger="click once" hx-include="#color" class="inline-block w-8 h-8" :class="{ 'border border-dashed': showGrid }">
+		<input type="number" name="pos" value={ fmt.Sprintf("%d", pos) } class="hidden"/>
+		@templ.Raw(fmt.Sprintf("<div role=\"button\" class=\"h-full block\" style=\"background-color:#%02x%02x%02x\"></div>", pixel.R, pixel.G, pixel.B))
+	</form>
+}

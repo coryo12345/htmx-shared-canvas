@@ -1,0 +1,14 @@
+package web
+
+import "shared-canvas/cmd/web/components"
+
+templ Home(canvas templ.Component) {
+	@Base() {
+		@components.Card(components.CardProps{Title: "What is Magic Canvas?", Description: "A pixel-art canvas", MaxWidth: "350px"}) {
+			<p><strong>Magic Canvas</strong> is a pixel-art canvas that is shared by all users. This is a project built as an example of using websockets for data transfer.</p>
+		}
+		if canvas != nil {
+			@canvas
+		}
+	}
+}

@@ -1,0 +1,17 @@
+{
+  "name": "shared-canvas",
+  "version": "1.0.0",
+  "description": "One Paragraph of project description goes here",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss --minify --output=./cmd/web/static/built-styles.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "alpinejs": "^3.13.7",
+    "htmx.org": "^1.9.10",
+    "tailwindcss": "^3.4.1"
+  }
+}

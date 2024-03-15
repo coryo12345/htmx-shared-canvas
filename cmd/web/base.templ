@@ -1,0 +1,22 @@
+package web
+
+templ Base() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Magic Canvas</title>
+			<script src="/static/htmx.min.js"></script>
+			<script src="/static/htmx-ws.js"></script>
+			<script src="/static/alpine.cdn.min.js"></script>
+			<link rel="stylesheet" href="static/built-styles.css"/>
+		</head>
+		<body>
+			<header class="text-center text-2xl font-bold border-b mb-4 py-2 shadow">Magic Canvas</header>
+			<main class="text-center px-2">
+				{ children... }
+			</main>
+		</body>
+	</html>
+}
