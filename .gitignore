@@ -28,4 +28,5 @@ tmp/
 # Project build
 main
 
+.DS_Store
 node_modules/
