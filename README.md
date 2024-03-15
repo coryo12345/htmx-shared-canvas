@@ -9,26 +9,6 @@ Open multiple tabs, browsers, or try it on multiple devices & the canvas will sy
 
 <img src="./doc/app.png" alt="app screenshot" width="300px">
 
-## TODO
-* [x] fix canvas grid so there are always the correct number of cols in a row
-* [x] add card component to clean up display
-* [x] add default colors
-* [x] investigate websockets to push updates to all users
-* [x] add ids to each pixel element (based on position)
-* [x] add websocket code to server
-* [x] add websocket code to client
-* [x] make mobile-friendly
-* [x] add dockerfile
-* [x] use logger for errors
-* [x] add a utility endpoint to clear the canvas
-* [x] make README a bit better
-* [x] make git repo
-* [x] deploy!
-* [x] add deployed site link to README
-* [ ] add to my website
-* [ ] clear TODO list
-* [ ] allow for zooming on canvas
-
 ## Technology
 This application is a simple Go webserver that servers HTML content. The content is built via [templ](https://templ.guide/), a powerful component-based templating library for Go. The server is powered by [fiber](https://docs.gofiber.io/), a web framework for Go. 
 
@@ -73,3 +53,6 @@ clean up binary from the last build
 ```bash
 make clean
 ```
+
+## TODO
+* [ ] allow for zooming on canvas
