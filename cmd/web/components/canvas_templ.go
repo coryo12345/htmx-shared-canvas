@@ -12,8 +12,41 @@ import "bytes"
 
 import (
 	"fmt"
+	"math"
 	"shared-canvas/internal/canvas"
 )
+
+func getZoomScale(canvas *canvas.Canvas) int {
+	resolution := int(math.Min(float64(canvas.Height()), float64(canvas.Width())))
+	return resolution / 10
+}
+
+func createPixelSizeClass(width int, height int) templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_createPixelSizeClass_c1e0`,
+		Function: `function __templ_createPixelSizeClass_c1e0(width, height){const PADDING = 16 * 4;
+	let maxSize = 4;
+	if (width <= height) {
+		maxSize = Math.floor((Math.min(window.innerWidth, 900) - PADDING) / width);
+	} else {
+		maxSize = Math.floor((Math.min(window.innerHeight, 900) - PADDING) / height);
+	}
+
+
+	const style = document.createElement('style');
+	style.type = 'text/css';
+	style.innerHTML = ` + "`" + `
+		.pixel {
+			width: ${maxSize}px;
+			height: ${maxSize}px;
+		}
+	` + "`" + `;
+	document.getElementsByTagName('head')[0].appendChild(style);
+}`,
+		Call:       templ.SafeScript(`__templ_createPixelSizeClass_c1e0`, width, height),
+		CallInline: templ.SafeScriptInline(`__templ_createPixelSizeClass_c1e0`, width, height),
+	}
+}
 
 func Canvas(canvas *canvas.Canvas) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
@@ -28,7 +61,15 @@ func Canvas(canvas *canvas.Canvas) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<article x-data=\"{ showGrid: false, color: &#39;#000099&#39; }\" hx-ext=\"ws\" ws-connect=\"/ws\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<article x-data=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("{ showGrid: false, color: '#000099', zoom: 1, minZoom: 1, maxZoom: %d, zoomStep: %f }", getZoomScale(canvas), float32(getZoomScale(canvas))/8.0)))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"ws\" ws-connect=\"/ws\"><!-- controls -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +89,7 @@ func Canvas(canvas *canvas.Canvas) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></section>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></section><section class=\"mt-2\"><h4 class=\"font-semibold mb-1\">Zoom</h4><div class=\"flex gap-2\"><button class=\"border rounded shadow text-lg font-bold px-2 py-0\" :class=\"{ &#39;text-gray-500&#39;: zoom &lt;= minZoom }\" :disabled=\"zoom &lt;= minZoom\" @click=\"zoom = Math.max(zoom - zoomStep, minZoom)\">-</button> <button class=\"border rounded shadow text-lg font-bold px-2 py-0\" :class=\"{ &#39;text-gray-500&#39;: zoom &gt;= maxZoom }\" :disabled=\"zoom &gt;= maxZoom\" @click=\"zoom = Math.min(zoom + zoomStep, maxZoom)\">+</button> <span class=\"flex-1\"></span> <button class=\"border rounded shadow px-2 py-1\" @click=\"zoom = 1\">Reset Zoom</button></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -61,13 +102,17 @@ func Canvas(canvas *canvas.Canvas) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- canvas -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Var3 := templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			templ_7745c5c3_Err = templ.Raw(fmt.Sprintf("<div class=\"grid w-fit mx-auto pr-4\" style=\"grid-template-columns: repeat(%d,1fr)\">", canvas.Width())).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templ.Raw(fmt.Sprintf("<div id=\"canvas\" class=\"grid w-fit mx-auto p-4 origin-top-left\" style=\"grid-template-columns: repeat(%d,1fr);\" :style=\"{ transform: 'scale(' + zoom + ')'}\">", canvas.Width())).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -90,7 +135,11 @@ func Canvas(canvas *canvas.Canvas) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Card(CardProps{Class: "w-fit overflow-x-scroll pr-0 ", MaxWidth: "100%"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Card(CardProps{Class: "w-fit overflow-x-scroll !p-0", MaxWidth: "100%"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = createPixelSizeClass(canvas.Width(), canvas.Height()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -126,7 +175,7 @@ func CanvasPixel(pos int, pixel canvas.Pixel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" ws-send hx-swap-oob=\"true\" hx-trigger=\"click once\" hx-include=\"#color\" class=\"inline-block w-8 h-8\" :class=\"{ &#39;border border-dashed&#39;: showGrid }\"><input type=\"number\" name=\"pos\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" ws-send hx-swap-oob=\"true\" hx-trigger=\"click once\" hx-include=\"#color\" class=\"inline-block pixel\" :class=\"{ &#39;border border-dashed&#39;: showGrid }\"><input type=\"number\" name=\"pos\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

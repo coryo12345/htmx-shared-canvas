@@ -3,10 +3,38 @@ package components
 import (
 	"fmt"
 	"shared-canvas/internal/canvas"
+	"math"
 )
 
+func getZoomScale(canvas *canvas.Canvas) int {
+	resolution := int(math.Min(float64(canvas.Height()), float64(canvas.Width())))
+	return resolution / 10
+}
+
+script createPixelSizeClass(width int, height int) {
+	const PADDING = 16 * 4;
+	let maxSize = 4;
+	if (width <= height) {
+		maxSize = Math.floor((Math.min(window.innerWidth, 900) - PADDING) / width);
+	} else {
+		maxSize = Math.floor((Math.min(window.innerHeight, 900) - PADDING) / height);
+	}
+
+
+	const style = document.createElement('style');
+	style.type = 'text/css';
+	style.innerHTML = `
+		.pixel {
+			width: ${maxSize}px;
+			height: ${maxSize}px;
+		}
+	`;
+	document.getElementsByTagName('head')[0].appendChild(style);
+}
+
 templ Canvas(canvas *canvas.Canvas) {
-	<article x-data="{ showGrid: false, color: '#000099' }" hx-ext="ws" ws-connect="/ws">
+	<article x-data={ fmt.Sprintf("{ showGrid: false, color: '#000099', zoom: 1, minZoom: 1, maxZoom: %d, zoomStep: %f }", getZoomScale(canvas), float32(getZoomScale(canvas)) / 8.0 ) } hx-ext="ws" ws-connect="/ws">
+		<!-- controls -->
 		@Card(CardProps{Title: "Tools", MaxWidth: "350px"}) {
 			<section class="my-2">
 				<input name="showGrid" id="showGrid" type="checkbox" :checked="showGrid" @change="showGrid = $event.target.checked"/>
@@ -23,19 +51,30 @@ templ Canvas(canvas *canvas.Canvas) {
 					}
 				</div>
 			</section>
+			<section class="mt-2">
+				<h4 class="font-semibold mb-1">Zoom</h4>
+				<div class="flex gap-2">
+					<button class="border rounded shadow text-lg font-bold px-2 py-0" :class="{ 'text-gray-500': zoom <= minZoom }" :disabled="zoom <= minZoom" @click="zoom = Math.max(zoom - zoomStep, minZoom)">-</button>
+					<button class="border rounded shadow text-lg font-bold px-2 py-0" :class="{ 'text-gray-500': zoom >= maxZoom }" :disabled="zoom >= maxZoom" @click="zoom = Math.min(zoom + zoomStep, maxZoom)">+</button>
+					<span class="flex-1"></span>
+					<button class="border rounded shadow px-2 py-1" @click="zoom = 1">Reset Zoom</button>
+				</div>
+			</section>
 		}
-		@Card(CardProps{Class: "w-fit overflow-x-scroll pr-0 ", MaxWidth: "100%"}) {
-			@templ.Raw(fmt.Sprintf("<div class=\"grid w-fit mx-auto pr-4\" style=\"grid-template-columns: repeat(%d,1fr)\">", canvas.Width()))
+		<!-- canvas -->
+		@Card(CardProps{Class: "w-fit overflow-x-scroll !p-0", MaxWidth: "100%"}) {
+			@templ.Raw(fmt.Sprintf("<div id=\"canvas\" class=\"grid w-fit mx-auto p-4 origin-top-left\" style=\"grid-template-columns: repeat(%d,1fr);\" :style=\"{ transform: 'scale(' + zoom + ')'}\">", canvas.Width()))
 			for i, pixel := range canvas.Pixels() {
 				@CanvasPixel(i, pixel)
 			}
 			@templ.Raw("</div>")
 		}
+		@createPixelSizeClass(canvas.Width(), canvas.Height())
 	</article>
 }
 
 templ CanvasPixel(pos int, pixel canvas.Pixel) {
-	<form id={ fmt.Sprintf("pixel-%d", pos) } ws-send hx-swap-oob="true" hx-trigger="click once" hx-include="#color" class="inline-block w-8 h-8" :class="{ 'border border-dashed': showGrid }">
+	<form id={ fmt.Sprintf("pixel-%d", pos) } ws-send hx-swap-oob="true" hx-trigger="click once" hx-include="#color" class="inline-block pixel" :class="{ 'border border-dashed': showGrid }">
 		<input type="number" name="pos" value={ fmt.Sprintf("%d", pos) } class="hidden"/>
 		@templ.Raw(fmt.Sprintf("<div role=\"button\" class=\"h-full block\" style=\"background-color:#%02x%02x%02x\"></div>", pixel.R, pixel.G, pixel.B))
 	</form>

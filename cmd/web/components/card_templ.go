@@ -27,7 +27,7 @@ func Card(props CardProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templ.Raw(fmt.Sprintf("<div class=\"rounded-md shadow-md border text-left p-4 mx-auto mb-4 %s\" style=\"max-width: %s\">", props.Class, props.MaxWidth)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ.Raw(fmt.Sprintf("<div class=\"%s rounded-md shadow-md border text-left p-4 mx-auto mb-4\" style=\"max-width: %s\">", props.Class, props.MaxWidth)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

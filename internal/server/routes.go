@@ -9,13 +9,15 @@ import (
 	"shared-canvas/internal/canvas"
 	"shared-canvas/internal/utils"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 )
 
-func (s *FiberServer) RegisterFiberRoutes() {
+func (s *FiberServer) RegisterFiberRoutes(environment string) {
 	s.App.Get("/", func(c *fiber.Ctx) error {
 		return web.RenderHomePage(c, s.Canvas)
 	})
@@ -27,6 +29,12 @@ func (s *FiberServer) RegisterFiberRoutes() {
 	})
 
 	s.App.Get("/ws", websocket.New(s.websocketUpdateHandler))
+
+	if !strings.Contains(strings.ToLower(environment), "prod") {
+		s.App.Use(monitor.New(monitor.Config{
+			Title: "shared-canvas Metrics",
+		}))
+	}
 }
 
 type updateData struct {

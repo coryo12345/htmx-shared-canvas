@@ -5,7 +5,7 @@ import (
 )
 
 templ Card(props CardProps) {
-	@templ.Raw(fmt.Sprintf("<div class=\"rounded-md shadow-md border text-left p-4 mx-auto mb-4 %s\" style=\"max-width: %s\">", props.Class, props.MaxWidth))
+	@templ.Raw(fmt.Sprintf("<div class=\"%s rounded-md shadow-md border text-left p-4 mx-auto mb-4\" style=\"max-width: %s\">", props.Class, props.MaxWidth))
 	<div>
 		if len(props.Title) > 0 {
 			<h3 class="font-bold text-lg">{ props.Title }</h3>

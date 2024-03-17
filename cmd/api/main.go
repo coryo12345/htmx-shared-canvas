@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	CANVAS_HEIGHT = 10
-	CANVAS_WIDTH  = 10
+	CANVAS_HEIGHT = 32
+	CANVAS_WIDTH  = 32
 )
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 
 	server := server.New(canvasRepo)
 
-	server.RegisterFiberMiddleware(env)
-	server.RegisterFiberRoutes()
+	server.RegisterFiberMiddleware()
+	server.RegisterFiberRoutes(env)
 
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	err := server.Listen(fmt.Sprintf(":%d", port))
