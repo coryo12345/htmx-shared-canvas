@@ -31,11 +31,11 @@ test:
 # Clean the binary
 clean:
 	@echo "Cleaning..."
-	@rm -f main
-	@rm -rf node_modules
-	@rm ./cmd/web/static/built-styles.css
-	@rm ./cmd/web/static/htmx-ws.js
-	@rm ./cmd/web/static/htmx.min.js
+	-rm -f main
+	-rm -rf node_modules
+	-rm ./cmd/web/static/built-styles.css
+	-rm ./cmd/web/static/htmx-ws.js
+	-rm ./cmd/web/static/htmx.min.js
 
 # Live Reload
 watch:
